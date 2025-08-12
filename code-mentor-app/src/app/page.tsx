@@ -1,13 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import ProjectUpload from "../components/ProjectUpload";
-import { FaLightbulb, FaCode, FaVolumeUp, FaRocket } from "react-icons/fa";
+import { FaLightbulb, FaCode, FaVolumeUp, FaRocket, FaSpinner } from "react-icons/fa";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("file"); // "file" or "git"
+  const [isUploading, setIsUploading] = useState(false);
+  const [repoUrl, setRepoUrl] = useState('');
+  const [error, setError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const router = useRouter();
+  
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+    
+    // Check if file is a zip file
+    if (!file.name.endsWith('.zip')) {
+      setError('Only ZIP files are supported');
+      return;
+    }
+    
+    setIsUploading(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('uploadType', 'zip');
+      formData.append('file', file);
+      
+      const response = await fetch('/api/upload-project', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to upload project');
+      }
+      
+      const data = await response.json();
+      router.push(`/dashboard/${data.projectId}`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload project');
+      setIsUploading(false);
+    }
+  };
+  
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+  
+  const onDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+  
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (isUploading || activeTab !== 'file') return;
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  }, [isUploading, activeTab]);
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -99,17 +162,41 @@ export default function Home() {
             </div>
             
             {/* File Upload Area */}
-            <div className={`${activeTab === 'file' ? 'block' : 'hidden'} border-2 border-dashed border-blue-500 rounded-xl p-10 flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer group mx-auto max-w-2xl h-64`}>
-              <input type="file" className="hidden" id="file-upload" multiple />
+            <div 
+              className={`${activeTab === 'file' ? 'block' : 'hidden'} border-2 border-dashed ${isDragging ? 'border-blue-600 bg-blue-100' : 'border-blue-500 bg-blue-50 hover:bg-blue-100'} rounded-xl p-10 flex flex-col items-center justify-center transition-colors cursor-pointer group mx-auto max-w-2xl h-64 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            >
+              <input 
+                type="file" 
+                className="hidden" 
+                id="file-upload" 
+                accept=".zip" 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file);
+                }}
+              />
               <label htmlFor="file-upload" className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
-                <div className="bg-blue-100 text-blue-600 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-                <p className="text-blue-700 font-medium mb-2 text-lg">Drag & Drop Project Files Here</p>
-                <p className="text-gray-500 text-center mb-4">or click to browse your files</p>
-                <p className="text-xs text-gray-400">Supports .zip, .rar, .tar.gz (Max: 50MB)</p>
+                {isUploading ? (
+                  <>
+                    <FaSpinner className="animate-spin text-blue-600 text-4xl mb-4" />
+                    <p className="text-blue-700 font-medium mb-2 text-lg">Uploading Project...</p>
+                    <p className="text-gray-500 text-center">Please wait while we process your file</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-blue-100 text-blue-600 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <p className="text-blue-700 font-medium mb-2 text-lg">{isDragging ? 'Drop Your ZIP File Here' : 'Drag & Drop Project Files Here'}</p>
+                    <p className="text-gray-500 text-center mb-4">or click to browse your files</p>
+                    <p className="text-xs text-gray-400">Supports .zip files (Max: 50MB)</p>
+                  </>
+                )}
               </label>
             </div>
             
@@ -126,12 +213,61 @@ export default function Home() {
                   type="text" 
                   placeholder="https://github.com/username/repo" 
                   className="border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                  value={repoUrl}
+                  onChange={(e) => setRepoUrl(e.target.value)}
+                  disabled={isUploading}
                 />
-                <button className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium">
-                  Import Repository
+                <button 
+                  className={`bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium flex items-center ${isUploading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  onClick={async () => {
+                    if (!repoUrl.trim()) {
+                      setError('Repository URL is required');
+                      return;
+                    }
+                    
+                    setIsUploading(true);
+                    setError('');
+                    
+                    try {
+                      const formData = new FormData();
+                      formData.append('uploadType', 'git');
+                      formData.append('repoUrl', repoUrl);
+                      
+                      const response = await fetch('/api/upload-project', {
+                        method: 'POST',
+                        body: formData,
+                      });
+                      
+                      if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.error || 'Failed to clone repository');
+                      }
+                      
+                      const data = await response.json();
+                      router.push(`/dashboard/${data.projectId}`);
+                    } catch (err: any) {
+                      setError(err.message || 'Failed to clone repository');
+                      setIsUploading(false);
+                    }
+                  }}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2" />
+                      Cloning Repository...
+                    </>
+                  ) : 'Import Repository'}
                 </button>
               </div>
             </div>
+            
+            {/* Error message */}
+            {error && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md max-w-2xl mx-auto">
+                {error}
+              </div>
+            )}
           </div>
         </div>
       </section>

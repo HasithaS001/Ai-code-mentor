@@ -100,24 +100,22 @@ export default function DashboardPage({ params }: DashboardPageProps) {
   }
 
   return (
-   <div
-  className="dashboard-container font-inter"
-  style={{
-    background: 'linear-gradient(to right, #0d1117, #141b22, #2c3e50)',
-  }}
->
-
+    <div
+      className="dashboard-container font-inter"
+      style={{
+        background: "linear-gradient(to right, #0d1117, #141b22, #2c3e50)",
+      }}
+    >
       <Header projectId={projectId} />
 
       <div className="dashboard-content grid grid-cols-12 gap-4 p-4 w-full">
         {/* File Explorer */}
-        <div className="col-span-2 scrollable-section rounded-4xl border border-gray-700/50">
-
+        <div className="col-span-2 scrollable-section rounded-2xl border border-gray-700/50">
           <FileExplorer files={projectFiles} onSelectFile={handleSelectFile} />
         </div>
 
         {/* Code Editor */}
-        <div className="col-span-7 bg-gray-900 rounded-4xl border border-gray-700/50 overflow-hidden">
+        <div className="col-span-7 bg-gray-900 rounded-2xl  border border-gray-700/50 overflow-hidden">
           {selectedFile ? (
             <CodeEditor file={selectedFile} />
           ) : (
@@ -180,7 +178,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
         </div>
 
         {/* Chat Interface */}
-        <div className="col-span-3 scrollable-section bg-gray-900 rounded-4xl border border-gray-700/50 overflow-hidden">
+        <div className="col-span-3 scrollable-section bg-gray-900 rounded-2xl border border-gray-700/50 overflow-hidden">
           <ChatInterface projectId={projectId} selectedFile={selectedFile} />
         </div>
       </div>

@@ -5,91 +5,108 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import ProjectUpload from "../components/ProjectUpload";
-import { FaLightbulb, FaCode, FaVolumeUp, FaRocket, FaSpinner } from "react-icons/fa";
+import {
+  FaLightbulb,
+  FaCode,
+  FaVolumeUp,
+  FaRocket,
+  FaSpinner,
+} from "react-icons/fa";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("file"); // "file" or "git"
   const [isUploading, setIsUploading] = useState(false);
-  const [repoUrl, setRepoUrl] = useState('');
-  const [error, setError] = useState('');
+  const [repoUrl, setRepoUrl] = useState("");
+  const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
-  
+
   const handleFileUpload = async (file: File) => {
     if (!file) return;
-    
+
     // Check if file is a zip file
-    if (!file.name.endsWith('.zip')) {
-      setError('Only ZIP files are supported');
+    if (!file.name.endsWith(".zip")) {
+      setError("Only ZIP files are supported");
       return;
     }
-    
+
     setIsUploading(true);
-    setError('');
-    
+    setError("");
+
     try {
       const formData = new FormData();
-      formData.append('uploadType', 'zip');
-      formData.append('file', file);
-      
-      const response = await fetch('/api/upload-project', {
-        method: 'POST',
+      formData.append("uploadType", "zip");
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload-project", {
+        method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to upload project');
+        throw new Error(data.error || "Failed to upload project");
       }
-      
+
       const data = await response.json();
       router.push(`/dashboard/${data.projectId}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to upload project');
+      setError(err.message || "Failed to upload project");
       setIsUploading(false);
     }
   };
-  
+
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   }, []);
-  
+
   const onDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   }, []);
-  
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (isUploading || activeTab !== 'file') return;
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  }, [isUploading, activeTab]);
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      if (isUploading || activeTab !== "file") return;
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileUpload(files[0]);
+      }
+    },
+    [isUploading, activeTab, handleFileUpload]
+  ); // Added handleFileUpload to dependency array
+
+  // FIX: Added flex and flex-col to allow the container to grow and enable scrolling. Removed typo "rou".
   return (
-    <div className="min-h-screen bg-gray-50 rou ">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-white text-center py-16">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-gray-900">
-            Master Code — Like You're Pairing with an <span className="text-blue-600">Expert Developer</span>
+            Master Code — Like You're Pairing with an{" "}
+            <span className="text-blue-600">Expert Developer</span>
           </h1>
           <p className="text-xl mb-8 text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            Turn your project into a step-by-step learning journey with AI-powered voice explanations, clear text details, and visual walkthroughs — all designed to help you truly understand your code.
+            Turn your project into a step-by-step learning journey with
+            AI-powered voice explanations, clear text details, and visual
+            walkthroughs — all designed to help you truly understand your code.
           </p>
-          <a href="#features" className="inline-block border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center mt-4">
+          <a
+            href="#features"
+            className="inline-block border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center mt-4"
+          >
             Learn More
           </a>
         </div>
       </section>
-      
+
       {/* Steps Section */}
       <section className="bg-white py-4">
         <div className="container mx-auto px-4 max-w-5xl">
@@ -100,153 +117,251 @@ export default function Home() {
                 <span className="text-2xl font-bold">1</span>
                 <div className="absolute w-full h-full rounded-full border-2 border-blue-300 animate-ping opacity-20"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Upload Project</h3>
-              <p className="text-gray-600">Upload your code files or connect your GitHub repository</p>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Upload Project
+              </h3>
+              <p className="text-gray-600">
+                Upload your code files or connect your GitHub repository
+              </p>
             </div>
-            
+
             {/* Connector */}
             <div className="hidden md:block border-t-2 border-dashed border-gray-300 flex-grow mx-4 h-0"></div>
-            
+
             {/* Step 2 */}
             <div className="flex flex-col items-center text-center max-w-xs">
               <div className="bg-blue-100 text-blue-600 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Scan Project</h3>
-              <p className="text-gray-600">Our AI analyzes your code structure and identifies key components</p>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Scan Project
+              </h3>
+              <p className="text-gray-600">
+                Our AI analyzes your code structure and identifies key
+                components
+              </p>
             </div>
-            
+
             {/* Connector */}
             <div className="hidden md:block border-t-2 border-dashed border-gray-300 flex-grow mx-4 h-0"></div>
-            
+
             {/* Step 3 */}
             <div className="flex flex-col items-center text-center max-w-xs">
               <div className="bg-blue-100 text-blue-600 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">Start Learning</h3>
-              <p className="text-gray-600">Get AI-powered voice explanations and visual walkthroughs</p>
+              <h3 className="text-xl font-semibold mb-2 text-black">
+                Start Learning
+              </h3>
+              <p className="text-gray-600">
+                Get AI-powered voice explanations and visual walkthroughs
+              </p>
             </div>
           </div>
         </div>
       </section>
-      
+
       {/* Project Upload Section */}
-      <section id="upload-section" className="py-2 bg-white">
+      <section id="upload-section" className="py-20 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="bg-white rounded-2xl shadow-lg p-6 relative z-10 border-2 border-dashed border-blue-500">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Upload Your Project</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+              Upload Your Project
+            </h2>
+
             {/* Toggle Switch */}
             <div className="flex justify-center mb-8">
               <div className="bg-gray-100 p-1 rounded-full flex items-center">
-                <button 
-                  className={`px-4 py-2 rounded-full focus:outline-none transition-all duration-300 flex items-center space-x-2 ${activeTab === 'file' ? 'bg-blue-500 text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}
-                  onClick={() => setActiveTab('file')}
+                <button
+                  className={`px-4 py-2 rounded-full focus:outline-none transition-all duration-300 flex items-center space-x-2 ${
+                    activeTab === "file"
+                      ? "bg-blue-500 text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setActiveTab("file")}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
                   </svg>
                   <span>File Upload</span>
                 </button>
-                <button 
-                  className={`px-4 py-2 rounded-full focus:outline-none transition-all duration-300 flex items-center space-x-2 ${activeTab === 'git' ? 'bg-blue-500 text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}
-                  onClick={() => setActiveTab('git')}
+                <button
+                  className={`px-4 py-2 rounded-full focus:outline-none transition-all duration-300 flex items-center space-x-2 ${
+                    activeTab === "git"
+                      ? "bg-blue-500 text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setActiveTab("git")}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
                   </svg>
                   <span>Git Repository</span>
                 </button>
               </div>
             </div>
-            
+
             {/* File Upload Area */}
-            <div 
-              className={`${activeTab === 'file' ? 'block' : 'hidden'} border-2 border-dashed ${isDragging ? 'border-blue-600 bg-blue-100' : 'border-blue-500 bg-blue-50 hover:bg-blue-100'} rounded-xl p-10 flex flex-col items-center justify-center transition-colors cursor-pointer group mx-auto max-w-2xl h-64 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+            <div
+              className={`${
+                activeTab === "file" ? "block" : "hidden"
+              } border-2 border-dashed ${
+                isDragging
+                  ? "border-blue-600 bg-blue-100"
+                  : "border-blue-500 bg-blue-50 hover:bg-blue-100"
+              } rounded-xl p-10 flex flex-col items-center justify-center transition-colors cursor-pointer group mx-auto max-w-2xl h-64 ${
+                isUploading ? "opacity-50 pointer-events-none" : ""
+              }`}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               onDrop={onDrop}
             >
-              <input 
-                type="file" 
-                className="hidden" 
-                id="file-upload" 
-                accept=".zip" 
+              <input
+                type="file"
+                className="hidden"
+                id="file-upload"
+                accept=".zip"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) handleFileUpload(file);
                 }}
               />
-              <label htmlFor="file-upload" className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
+              <label
+                htmlFor="file-upload"
+                className="w-full h-full flex flex-col items-center justify-center cursor-pointer"
+              >
                 {isUploading ? (
                   <>
                     <FaSpinner className="animate-spin text-blue-600 text-4xl mb-4" />
-                    <p className="text-blue-700 font-medium mb-2 text-lg">Uploading Project...</p>
-                    <p className="text-gray-500 text-center">Please wait while we process your file</p>
+                    <p className="text-blue-700 font-medium mb-2 text-lg">
+                      Uploading Project...
+                    </p>
+                    <p className="text-gray-500 text-center">
+                      Please wait while we process your file
+                    </p>
                   </>
                 ) : (
                   <>
                     <div className="bg-blue-100 text-blue-600 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-10 w-10"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
                       </svg>
                     </div>
-                    <p className="text-blue-700 font-medium mb-2 text-lg">{isDragging ? 'Drop Your ZIP File Here' : 'Drag & Drop Project Files Here'}</p>
-                    <p className="text-gray-500 text-center mb-4">or click to browse your files</p>
-                    <p className="text-xs text-gray-400">Supports .zip files (Max: 50MB)</p>
+                    <p className="text-blue-700 font-medium mb-2 text-lg">
+                      {isDragging
+                        ? "Drop Your ZIP File Here"
+                        : "Drag & Drop Project Files Here"}
+                    </p>
+                    <p className="text-gray-500 text-center mb-4">
+                      or click to browse your files
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Supports .zip files (Max: 50MB)
+                    </p>
                   </>
                 )}
               </label>
             </div>
-            
+
             {/* Repository URL Input */}
-            <div className={`${activeTab === 'git' ? 'block' : 'hidden'} border-2 border-dashed border-blue-500 rounded-xl p-10 mx-auto max-w-2xl`}>
+            <div
+              className={`${
+                activeTab === "git" ? "block" : "hidden"
+              } border-2 border-dashed border-blue-500 rounded-xl p-10 mx-auto max-w-2xl`}
+            >
               <div className="flex flex-col items-center">
                 <div className="bg-gray-100 text-gray-700 p-4 rounded-full mb-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.839c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.839c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                    />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-700 mb-6">Enter GitHub Repository URL</h3>
-                <input 
-                  type="text" 
-                  placeholder="https://github.com/username/repo" 
+                <h3 className="text-lg font-medium text-gray-700 mb-6">
+                  Enter GitHub Repository URL
+                </h3>
+                <input
+                  type="text"
+                  placeholder="https://github.com/username/repo"
                   className="border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
                   value={repoUrl}
                   onChange={(e) => setRepoUrl(e.target.value)}
                   disabled={isUploading}
                 />
-                <button 
-                  className={`bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium flex items-center ${isUploading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                <button
+                  className={`bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors font-medium flex items-center ${
+                    isUploading ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                   onClick={async () => {
                     if (!repoUrl.trim()) {
-                      setError('Repository URL is required');
+                      setError("Repository URL is required");
                       return;
                     }
-                    
+
                     setIsUploading(true);
-                    setError('');
-                    
+                    setError("");
+
                     try {
                       const formData = new FormData();
-                      formData.append('uploadType', 'git');
-                      formData.append('repoUrl', repoUrl);
-                      
-                      const response = await fetch('/api/upload-project', {
-                        method: 'POST',
+                      formData.append("uploadType", "git");
+                      formData.append("repoUrl", repoUrl);
+
+                      const response = await fetch("/api/upload-project", {
+                        method: "POST",
                         body: formData,
                       });
-                      
+
                       if (!response.ok) {
                         const data = await response.json();
-                        throw new Error(data.error || 'Failed to clone repository');
+                        throw new Error(
+                          data.error || "Failed to clone repository"
+                        );
                       }
-                      
+
                       const data = await response.json();
                       router.push(`/dashboard/${data.projectId}`);
                     } catch (err: any) {
-                      setError(err.message || 'Failed to clone repository');
+                      setError(err.message || "Failed to clone repository");
                       setIsUploading(false);
                     }
                   }}
@@ -257,11 +372,13 @@ export default function Home() {
                       <FaSpinner className="animate-spin mr-2" />
                       Cloning Repository...
                     </>
-                  ) : 'Import Repository'}
+                  ) : (
+                    "Import Repository"
+                  )}
                 </button>
               </div>
             </div>
-            
+
             {/* Error message */}
             {error && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md max-w-2xl mx-auto">
@@ -271,65 +388,65 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
+
       {/* Features Section */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">How It Works</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              How It Works
+            </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Get AI-powered explanations for any code snippet with voice narration
+              Get AI-powered explanations for any code snippet with voice
+              narration
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-blue-100 text-blue-600 w-14 h-14 rounded-full flex items-center justify-center mb-6">
                 <FaCode size={24} />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Upload Your Project</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                Upload Your Project
+              </h3>
               <p className="text-gray-600">
-                Upload a ZIP file or paste a Git repository URL to get started. We'll analyze your project structure and dependencies.
+                Upload a ZIP file or paste a Git repository URL to get started.
+                We'll analyze your project structure and dependencies.
               </p>
             </div>
-            
+
             <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-purple-100 text-purple-600 w-14 h-14 rounded-full flex items-center justify-center mb-6">
                 <FaLightbulb size={24} />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Select Code Snippets</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                Select Code Snippets
+              </h3>
               <p className="text-gray-600">
-                Highlight any code snippet in the interactive editor. A tooltip will appear allowing you to request an explanation.
+                Highlight any code snippet in the interactive editor. A tooltip
+                will appear allowing you to request an explanation.
               </p>
             </div>
-            
+
             <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-green-100 text-green-600 w-14 h-14 rounded-full flex items-center justify-center mb-6">
                 <FaVolumeUp size={24} />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Listen to Explanations</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                Listen to Explanations
+              </h3>
               <p className="text-gray-600">
-                Get clear, conversational explanations of your code with automatic voice narration powered by Google Cloud TTS.
+                Get clear, conversational explanations of your code with
+                automatic voice narration powered by Google Cloud TTS.
               </p>
             </div>
           </div>
         </div>
       </section>
-      
-      {/* Upload Section */}
-      <section id="upload-section" className="py-20 bg-gray-100">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Get Started Now</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Upload your project and start learning with AI-powered explanations
-            </p>
-          </div>
-          
-          <ProjectUpload />
-        </div>
-      </section>
-      
+
+      {/* FIX: Removed the redundant second Upload Section that was here */}
+
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-12">
         <div className="container mx-auto px-4 max-w-6xl">
@@ -343,22 +460,34 @@ export default function Home() {
                 Learn code faster with AI-powered explanations
               </p>
             </div>
-            
+
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Contact
               </a>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Code Mentor. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} Code Mentor. All rights
+              reserved.
+            </p>
           </div>
         </div>
       </footer>

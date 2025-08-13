@@ -72,7 +72,7 @@ export default function Home() {
     }
   }, [isUploading, activeTab]);
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 rou ">
       <Header />
       
       {/* Hero Section */}

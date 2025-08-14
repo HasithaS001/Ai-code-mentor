@@ -299,7 +299,7 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 border-l border-gray-700 text-gray-300">
+    <div className="flex flex-col h-full bg-gradient-to-b from-[#000000] via-[#0b0f13] to-[#2c3e50] border-l border-gray-700 text-gray-300">
       <div className="p-3 border-b border-gray-700">
         <div className="flex flex-col space-y-2">
           <h2 className="text-lg font-semibold text-gray-200 text-center">

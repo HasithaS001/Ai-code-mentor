@@ -49,8 +49,8 @@ const FileTreeNode = ({
   return (
     <div>
       <div
-        className={`flex items-center group py-2 px-3 rounded-lg cursor-pointer transition-all duration-200 ${
-          node.type === "file" ? "hover:bg-teal-900/50" : "hover:bg-gray-700"
+        className={`flex items-center group py-2 px-3 rounded-md cursor-pointer transition-all duration-200 ${
+          node.type === "file" ? "hover:bg-teal-900/50" : "hover:bg-[#181818]"
         }`}
         style={{ paddingLeft: `${depth * 16 + 12}px` }}
         onClick={node.type === "file" ? handleSelectFile : handleToggle}
@@ -156,16 +156,12 @@ export default function FileExplorer({
     : files;
 
   return (
-    <div className="h-full overflow-auto bg-gradient-to-br from-[#000000] via-[#0b0f13] to-[#18232e] text-gray-300 rounded-4xl">
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-base font-bold text-gray-200 tracking-wide">
-            Project Files
-          </h2>
-
-          <div className="flex items-center bg-gray-800 rounded-full shadow-lg px-3 py-2 group relative">
+    <div className="h-full flex flex-col text-gray-300 rounded-lg">
+      <div className="flex-shrink-0 p-4">
+        <div className="flex justify-start items-center mb-5">
+          <div className="flex items-center bg-gray-800 rounded-lg shadow-lg px-3 py-2 group relative">
             {/* Enhanced Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2 w-72 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+            <div className="absolute bottom-full right-0 mb-2 w-72 bg-[#181818] border border-gray-700 rounded-xl shadow-2xl p-4 text-xs text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
               <div className="flex items-center mb-2">
                 <FaGraduationCap className="text-teal-400 mr-2" />
                 <div className="font-semibold text-teal-400">Beginner Lens</div>
@@ -176,7 +172,7 @@ export default function FileExplorer({
                 beginners don't need to focus on.
               </p>
 
-              <div className="bg-gray-900 p-3 rounded-lg">
+              <div className="bg-[#181818] p-3 rounded-lg">
                 <div className="font-medium text-gray-200 mb-1">
                   How it works:
                 </div>
@@ -194,7 +190,7 @@ export default function FileExplorer({
                 between beginner and advanced views
               </div>
 
-              <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800 border-r border-b border-gray-700"></div>
+              <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-[#181818] border-r border-b border-gray-700"></div>
             </div>
 
             <div className="flex items-center">
@@ -217,7 +213,7 @@ export default function FileExplorer({
                     after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
                     after:bg-white after:rounded-full after:shadow-md
                     after:h-5 after:w-5 after:transition-all after:duration-300 after:ease-in-out
-                    ${beginnerLensActive ? "bg-teal-600" : "bg-gray-700"}
+                    ${beginnerLensActive ? "bg-teal-600" : "bg-[#181818]"}
                   `}
                 ></div>
                 <span className="ml-2 flex items-center">
@@ -238,22 +234,23 @@ export default function FileExplorer({
           </div>
         </div>
 
-        {/* File Tree */}
-        <div className="mt-4">
-          {filteredFiles.length > 0 ? (
-            filteredFiles.map((fileNode, index) => (
-              <FileTreeNode
-                key={`${fileNode.path}-${index}`}
-                node={fileNode}
-                onSelectFile={onSelectFile}
-              />
-            ))
-          ) : (
-            <div className="text-center py-10 text-gray-400 font-medium rounded-lg bg-gray-800">
-              No files found
-            </div>
-          )}
-        </div>
+      </div>
+      
+      {/* Scrollable File Tree */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+        {filteredFiles.length > 0 ? (
+          filteredFiles.map((fileNode, index) => (
+            <FileTreeNode
+              key={`${fileNode.path}-${index}`}
+              node={fileNode}
+              onSelectFile={onSelectFile}
+            />
+          ))
+        ) : (
+          <div className="text-center py-10 text-gray-400 font-medium rounded-lg bg-[#181818]">
+            No files found
+          </div>
+        )}
       </div>
     </div>
   );

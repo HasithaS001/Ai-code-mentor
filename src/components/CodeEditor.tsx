@@ -13,6 +13,8 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import VisualExplanation from "./VisualExplanation";
+import CodeHighlightOverlay from "./CodeHighlightOverlay";
+import { useCodeHighlight } from "../hooks/useCodeHighlight";
 import {
   textToSpeech,
   stopAudio,
@@ -33,6 +35,16 @@ export default function CodeEditor({ file }: CodeEditorProps) {
   // Get settings for voice and language
   const { settings } = useSettings();
   const editorRef = useRef<any>(null);
+  
+  // Code highlight functionality
+  const {
+    isHighlightActive,
+    selectionBounds,
+    editorContainerRef,
+    activateHighlight,
+    deactivateHighlight,
+    updateSelectionBounds,
+  } = useCodeHighlight();
   const [selectedCode, setSelectedCode] = useState("");
   const [selectionPosition, setSelectionPosition] = useState<{
     x: number;
@@ -178,6 +190,13 @@ export default function CodeEditor({ file }: CodeEditorProps) {
   // Handle editor mount and define custom theme
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
     editorRef.current = editor;
+    
+    // Add selection change listener to update highlight bounds
+    editor.onDidChangeCursorSelection(() => {
+      if (isHighlightActive) {
+        updateSelectionBounds(editor);
+      }
+    });
 
     // Define a custom dark theme
     monaco.editor.defineTheme("custom-dark", {
@@ -257,6 +276,12 @@ export default function CodeEditor({ file }: CodeEditorProps) {
   // Handle explain button click
   const handleExplain = async () => {
     if (!selectedCode || isExplaining) return;
+
+    // Activate the highlight overlay for the selected code
+    if (editorRef.current) {
+      console.log("Activating highlight for selected code:", selectedCode);
+      activateHighlight(editorRef.current);
+    }
 
     setIsExplaining(true);
     setHasPlayedOnce(false); // Reset the played once flag for new explanations
@@ -363,7 +388,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
         }
 
         textToSpeech(explanationText, settings.language, {
-          onProgress: (progress) => setSpeechProgress(progress),
+          onProgress: (progress: number) => setSpeechProgress(progress),
           onComplete: () => {
             setSpeechProgress(100);
             setIsLoadingAudio(false); // Clear loading state when complete
@@ -373,7 +398,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
             }, 500);
           },
           playbackSpeed: playbackSpeed,
-        }).catch((err) => {
+        }).catch((err: any) => {
           console.error("Error playing speech:", err);
           setIsPlaying(false);
           setIsLoadingAudio(false); // Clear loading state on error
@@ -576,7 +601,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
       {/* Explanation panel */}
       {explanation && (
         <div
-          className="absolute bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 shadow-2xl overflow-hidden flex flex-col z-20"
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-br from-[#000000] via-[#0b0f13] to-[#18232e] border-t border-gray-700 shadow-2xl overflow-hidden flex flex-col z-20"
           style={{ height: `${panelHeight}px`, maxHeight: "60vh" }}
         >
           {/* Modern rounded arrow button in right corner */}
@@ -630,7 +655,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
                           }, 500);
                         },
                         playbackSpeed: playbackSpeed,
-                      }).catch((err) => {
+                      }).catch((err: any) => {
                         console.error("Error playing speech:", err);
                         setIsPlaying(false);
                         setIsLoadingAudio(false);
@@ -832,7 +857,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
                                 }, 500);
                               },
                               playbackSpeed: playbackSpeed,
-                            }).catch((err) => {
+                            }).catch((err: any) => {
                               console.error("Error playing speech:", err);
                               setIsPlaying(false);
                               setIsLoadingAudio(false);
@@ -901,7 +926,7 @@ export default function CodeEditor({ file }: CodeEditorProps) {
                               }, 1000);
                             },
                             playbackSpeed: playbackSpeed,
-                          }).catch((err) => {
+                          }).catch((err: any) => {
                             console.error("Error playing speech:", err);
                             setIsPlaying(false);
                             setIsLoadingAudio(false);
@@ -995,6 +1020,13 @@ export default function CodeEditor({ file }: CodeEditorProps) {
           </div>
         </div>
       )}
+      
+      {/* Code Highlight Overlay */}
+      <CodeHighlightOverlay
+        isActive={isHighlightActive}
+        selectionBounds={selectionBounds}
+        onClose={deactivateHighlight}
+      />
     </div>
   );
 }

@@ -81,7 +81,7 @@ const VisualExplanation: React.FC<VisualExplanationProps> = ({ code, language, p
     return (
       <div className="flex flex-col items-center justify-center p-8 h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <p className="text-[#364153]" style={{ fontSize: '16px' }}>Generating visual explanation...</p>
+        <p className="text-white" style={{ fontSize: '16px' }}>Generating visual explanation...</p>
       </div>
     );
   }
@@ -105,8 +105,8 @@ const VisualExplanation: React.FC<VisualExplanationProps> = ({ code, language, p
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-[#364153]">{title}</h3>
-        <p className="text-[#364153]" style={{ fontSize: '16px' }}>{description}</p>
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <p className="text-white" style={{ fontSize: '16px' }}>{description}</p>
       </div>
       <div className="flex-1" style={{ height: `${panelHeight}px` }}>
         <ReactFlow

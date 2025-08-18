@@ -18,9 +18,9 @@
   --gray-900: #111827;
 
   /* Scrollbar Colors */
-  --scrollbar-thumb: #0072df; /* Primary color for the thumb */
+  --scrollbar-thumb: #03958a; /* Teal color for the thumb */
   --scrollbar-track: rgba(243, 244, 246, 0.8); /* Light gray for the track */
-  --scrollbar-hover: #0058ab; /* Darker primary for hover state */
+  --scrollbar-hover: #027a6b; /* Darker teal for hover state */
 }
 
 /* Theme variables */
@@ -38,9 +38,9 @@
     --foreground: #ededed;
 
     /* Dark mode scrollbar colors */
-    --scrollbar-thumb: #4f46e5; /* Darker indigo for dark mode */
+    --scrollbar-thumb: #03958a; /* Teal color for dark mode */
     --scrollbar-track: rgba(31, 41, 55, 0.8); /* Dark gray for the track */
-    --scrollbar-hover: #6366f1; /* Lighter indigo for hover state */
+    --scrollbar-hover: #14b8a6; /* Lighter teal for hover state */
   }
 }
 

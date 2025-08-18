@@ -299,7 +299,7 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-[#000000] via-[#0b0f13] to-[#2c3e50] border-l border-gray-700 text-gray-300">
+    <div className="flex flex-col h-full border-l border-gray-700 text-gray-300">
       <div className="p-3 border-b border-gray-700">
         <div className="flex flex-col space-y-2">
           <h2 className="text-lg font-semibold text-gray-200 text-center">
@@ -666,7 +666,7 @@ export default function ChatInterface({
                   className={`max-w-[80%] rounded-lg p-3 ${
                     message.role === "user"
                       ? "bg-teal-600 text-white"
-                      : "bg-gray-800 text-gray-300"
+                      : "bg-[#181818] text-gray-300"
                   }`}
                 >
                   <div className="flex items-center mb-1">
@@ -694,7 +694,7 @@ export default function ChatInterface({
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-800 rounded-lg p-4 flex items-center text-gray-400">
+                <div className="bg-[#181818] rounded-lg p-4 flex items-center text-gray-400">
                   <FaSpinner className="animate-spin mr-2" />
                   <span>Thinking...</span>
                 </div>
@@ -715,7 +715,7 @@ export default function ChatInterface({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask a question..."
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-200 placeholder-gray-400 font-lato text-sm"
+                  className="w-full bg-[#181818] border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-200 placeholder-gray-400 font-lato text-sm"
                   disabled={isLoading}
                 />
               </div>

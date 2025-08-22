@@ -1,5 +1,5 @@
 // API Configuration
-export const GEMINI_API_KEY = "AIzaSyCIfrFUT2Yo_1BV94WFmGLtMUXHryWU3E8";
+export const GEMINI_API_KEY = "AIzaSyBRYZngrGeGiBcw70QxBPTnlMgLq5zYI-o";
 export const GEMINI_MODEL = "gemini-1.5-pro";
 
 // ElevenLabs API Key
